@@ -202,30 +202,34 @@ Save the file.
 
 
 NFS Configuration
-#rpm -qa | grep nfs
-#ifconfig eth0
-#cd /home/
-#mkdir servernfs
-#cd servernfs
-#cat>newfile
-(hello)
-# vi /etc/exports
+#mkdir /olddir
+#chmod 777 /olddir
+#vim /etc/exports
 (
-/home/servernfs *(rw,sync)
+/olddir 192.168.10.5 (rw,sync)
 )
+#service nfs start
+#service nfs restart
 #service iptables stop
-#service iptables status
-#service vsftpd stop
-#service vsftpd status
-#chmod -R 777 /home/servernfs/
+#vim /etc/sysconfig/nfs
+(
+Uncomment 21,23,41,50
+)
+#service nfs restart
+#cd /olddir/
+#ls
 
 Clone
-#cd /home
-#ls
-#mkdir clientnfs
-#mount -t nfs 192.168.10.5:/home/servernfs/ /home/clientnfs/
-#cd clientnfs/
-#ls
+#service nfs restart
+#mkdir /newdir
+#chmod 777 /newdir/
+#ifconfig
+#mount  192.168.10.5:/olddir  /newdir
+#cd /newdir/
+#touch a.txt
+#nano a.txt 
+(Hiii….ctrl+O, ctrl+x)
+#mkdir video
 
 
 Mail Server Configuration
