@@ -1,0 +1,838 @@
+How to set hostname
+#hostname
+#cat /etc/sysconfig/network
+#vim /etc/sysconfig/network
+#service NetworkManager restart
+#hostname
+
+GRUB Configuration
+#vim /boot/grub/grub.conf
+
+Apache Configuration
+Download httpd files 
+#rpm -qa | grep httpd
+#ifconfig
+#chkconfig httpd on
+#service httpd start
+#service httpd status
+#mkdir –p /var/www/virtual/www.hetvi.com/html
+#vim /var/www/virtual/www.hetvi.com/html/index.html
+(
+<html>
+<head>
+<title>Linux Apache</title>
+<body>
+Today we completed apache Server
+</body>
+</head>
+</html>
+)save :wq
+#vim /etc/httpd/conf/httpd.conf
+
+(
+Uncomment 7 lines from 1003
+<Virtual Host *:80> ServerAdmin 
+root@server.svkm.com 
+Document Root /var/www/virtual/server.svkm.com/html 
+ServerName www.svkm.com 
+ErrorLog logs/server.svkm.com-error_log 
+CustomLog logs/server.svkm.com-access_log 
+common 
+</Virtual Host>
+
+<Virtual Host *:80> ServerAdmin 
+root@server.svkm.com 
+Document Root /var/www/virtual/www.hetvi.com/html 
+ServerName www.hetvi.com 
+ErrorLog logs/www.hetvi.com-error_log 
+CustomLog logs/www.hetvi.com-access_log 
+common 
+</Virtual Host>
+):wq
+
+#service httpd restart
+#chmod –R 777 /var/www/virtual/www.hetvi.com/html
+(
+Go to the Clone and open browser and type 
+server.svkm.com OR 192.168.1.1 
+You can view your web page. 
+#links 192.168.1.1
+#links www.svkm.com
+)
+
+FTP Configuration
+Download vsftpd package
+#rpm -qa | grep vsftpd
+#chckconfig vsftpd on
+#cd /var/ftp/pub
+#cat > ftpfile 
+(Hello this is me )  
+#ifconfig
+#vi /etc/vsftpd/vsftpd.conf
+(
+Uncomment annonymous_enable - YES
+Uncomment  local_enable = YES
+Uncomment anonymous_upload_enable = YES
+Uncomment listen = YES
+)
+#service vsftpd restart
+#service vsftd start
+#service vsftpd status
+#ls -a
+#cd
+#chkconfig vsftpd on
+#service iptables start
+#service iptables stop
+#cd Destop
+#useradd hetvi
+#passwd hetvi
+#cd /home/hetvi
+#touch file1 file2 file3
+#setsebool ftp_home_dir 1
+
+Clone
+#mount /dev/cdrom/ /mnt
+#ping 192.168.10.5
+Ctrl+c
+#ftp 192.168.10.5
+ftp> ls
+ftp> mget file1 file2 file3
+mget file1? y
+mget file2? y
+ftp> bye
+#ls
+
+DNS Configuration
+Download bind packages
+#vim /etc/sysconfig/network-scripts/ifcfg-eth0
+(
+(DNS1=192.168.10.5)
+#vim /etc/hosts
+(192.168.10.5 server.hetvi.com)
+#vim /etc/sysconfig/network
+#vim /etc/resolv.conf
+(search hetvi.com
+Nameserver 192.168.10.5)
+#service network restart
+#vim /etc/named.conf
+(
+11-Listen -on port53(192.168.10.5)
+12 :- Comment it using “#” 
+# listen –on – v6 port 53{ : : 1:};
+17 :- allow – query{any;}
+}
+#vim /etc/named.rfc1912.zones
+(
+15-file “forward.zone”;
+31-File “reverse.zone”;
+)
+#cd /var/named
+#ls
+#cp named.localhost forward.zone
+#cp named.localhost reverse.zone
+#vim forward.zone
+(
+IN SOA server.hetvi.com. Root.server.hetvi.com
+IN NS server.hetvi.com.
+Server IN A 192.168.10.5
+#AAA
+)
+#vim reverse.zone
+(
+IN SOA server.hetvi.com. root.server.hetvi.com.
+IN NS server.hetvi.com.
+5 IN PTR server.hetvi.com.
+)
+#chgrp named forward.zone
+#chgrp named reverse.zone
+#service named start
+#dig server.hetvi.com
+#dig -x 192.168.10.5 
+
+
+DHCP Configuration
+Download dhcp packages
+#rpm -qa|grep  dhcp
+#hostname
+#setup
+(
+Auth>Net>Device>eth0>remove star, static IP, netmask>
+)
+#service dhcpd restart
+#ifdown eth0
+#ifup eth0
+#vi /etc/dhcp/dhcpd.conf
+#cp /usr/share/doc/dhcp-4.1.1/dhcpd.conf.sample /etc/dhcp/dhcpd.conf
+Y
+#vi /etc/dhcp/dhcpd.conf
+(
+Change option domain-name “example.org” to option domain-name “Your Machine Domain-name for e.g tyit.com” 
+Change option domain-name-servers ns1.example.org, ns2.example.org; to option fully qualify domain-name-server “Your Machine Domain-name for e.g server.tyit.com”; 
+Uncomment line no. 18 # authoritative (Remove # mark)
+Step 9 :- Comment Line No 27 and 28 
+Change these lines no 32 
+Subnet 10.254.239.0 netmask 255.255.255.224 
+{ 
+Range 10.254.239.10 10.254.239.20; 
+Option routersrtr-239-0-1.example.org,rtr-239-0-2.example.org 
+} 
+Following lines after changes 
+Subnet 198.168.10.0 netmask 255.255.255.0 (subnet ip is the first IP of your network.) 
+{ 
+Range 192.168.10.10 192.168.10.20; (Range means the range of IP Addressserver want to assign to DHCP Client) 
+#Option routersrtr-239-0-1.example.org,rtr-239-0-2.example.org 
+)
+#service dhcpd status
+#service dhcpd start 
+#service dhcpd restart 
+#chkconfig dhcp on 
+#chkconfig --list dhcpd
+#chkconfig dhcpd on
+#chkconfig --list dhcpd(off-off-on-on-on-on-off) 
+#chkconfig iptables stop(optional)
+#setenforce 0
+
+Make clone
+Right click on Network icon at right top corner on desktop-Edit Connection Select system eth0 Click on Edit button -select IPv4 setting option see the method manual Change it to DHCP (Automatically)
+#vi /etc/sysconfig/network-scripts/ifcfg-eth0 
+Change BOOTPROTO = dhcp 
+Save the file. 
+#service network restart
+#ifconfig
+
+
+NFS Configuration
+#rpm -qa | grep nfs
+#ifconfig eth0
+#cd /home/
+#mkdir servernfs
+#cd servernfs
+#cat>newfile
+(hello)
+# vi /etc/exports
+(
+/home/servernfs *(rw,sync)
+)
+#service iptables stop
+#service iptables status
+#service vsftpd stop
+#service vsftpd status
+#chmod -R 777 /home/servernfs/
+
+Clone
+#cd /home
+#ls
+#mkdir clientnfs
+#mount -t nfs 192.168.10.5:/home/servernfs/ /home/clientnfs/
+#cd clientnfs/
+#ls
+
+
+Mail Server Configuration
+#rpm -qa | grep sendmail
+# vim /etc/mail/sendmail.mc
+(
+Go to line number 116 
+dn1 # DAEMON_OPTIONS (‘Port = smtp , Addr =192.168.1.1 , 
+Name=’MTA’)
+)
+#m4 /etc/mail/sendmail.mc > /etc/mail/sendmail.cf
+# vi /var/named/forward.zone
+(
+Add MX Entry in forward.zone as follows: 
+IN 	MX	 192.168.1.3
+)
+# service sendmail restart
+# useradd test
+# passwd test
+# mail test@server.rizvi.com
+(
+It will ask for the Subject and Body of the mail 
+Example: 
+Subject: testmail 
+Body: Hi Everyone. 
+This is my First sendmail program. 
+Save the file by pressing keys <ctrl+d> which indicates End offile.
+)
+#su - test
+# mail
+(
+New emails are shown with letter N at starting and unread mail shown with letter U at starting. Once you read the mail U and N notification get cleared. 
+To read that mail type the number which will be given in previous output 
+# 1 
+You can now read the contents of mail. 
+To exit type <Ctrl+d>
+)
+
+Shell Scripting
+#vim palindrome.c
+#gcc palindrome.c -o -palindrome.out
+#./palindrome.out
+#include <stdio.h>
+
+int main() {
+    int num, reversed = 0, remainder, original;
+
+    // Input from user
+    printf("Enter a number: ");
+    scanf("%d", &num);
+
+    original = num; // store the original number
+
+    // Reverse the number
+    while (num != 0) {
+        remainder = num % 10;
+        reversed = reversed * 10 + remainder;
+        num /= 10;
+    }
+
+    // Check palindrome condition
+    if (original == reversed)
+        printf("%d is a palindrome number.\n", original);
+    else
+        printf("%d is not a palindrome number.\n", original);
+
+    return 0;
+}
+
+Armstrong
+#vim armstrong.c
+#include <stdio.h>
+
+int main() {
+    int num, temp, rem, sum = 0;
+
+    printf("Enter a number: ");
+    scanf("%d", &num);
+
+    temp = num;
+
+    while (temp > 0) {
+        rem = temp % 10;
+        sum = sum + (rem * rem * rem); // works for 3-digit numbers
+        temp = temp / 10;
+    }
+
+    if (sum == num)
+        printf("%d is an Armstrong number.\n", num);
+    else
+        printf("%d is not an Armstrong number.\n", num);
+
+    return 0;
+}
+
+Swap
+#vim swap.c
+#include <stdio.h>
+
+int main() {
+    int a, b, temp;
+
+    printf("Enter two numbers: ");
+    scanf("%d %d", &a, &b);
+
+    temp = a;
+    a = b;
+    b = temp;
+
+    printf("After swapping: a = %d, b = %d\n", a, b);
+
+    return 0;
+}
+
+Fabonacci
+#vim fabonacci.c
+#include <stdio.h>
+
+int main() {
+    int n, a = 0, b = 1, c, i;
+
+    printf("Enter number of terms: ");
+    scanf("%d", &n);
+
+    printf("Fibonacci Series: %d %d ", a, b);
+
+    for (i = 2; i < n; i++) {
+        c = a + b;
+        printf("%d ", c);
+        a = b;
+        b = c;
+    }
+
+    return 0;
+}
+
+Factorial
+#include <stdio.h>
+
+int main() {
+    int n, i;
+    long fact = 1;
+
+    printf("Enter a number: ");
+    scanf("%d", &n);
+
+    for(i = 1; i <= n; i++) {
+        fact = fact * i;
+    }
+
+    printf("Factorial of %d = %ld\n", n, fact);
+
+    return 0;
+}
+
+Even and odd
+#include <stdio.h>
+
+int main() {
+    int num;
+
+    printf("Enter a number: ");
+    scanf("%d", &num);
+
+    if (num % 2 == 0)
+        printf("%d is even.\n", num);
+    else
+        printf("%d is odd.\n", num);
+
+    return 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Linux Slip 
+1. a. Implement a linux server system with an ip address 192.168.0.45 andupdate the hostname as ServerXX (XX stands for rollno)
+b. Implement a linux client system with an ip address 192.168.0.24 and
+Update the hostname as ClientXX(XX stands for rollno)
+c. Restart the basic services essential for any network configurations.
+d. Add a normal user and login using any of the server terminal and resumeback to the GNOME terminal
+e. Create a folder with your name and give full access rights to that folder in
+f. Create a folder with another name and give only read, write access to thatfolder in clientto be done using linux commands
+Show each step output to the examiner and write the same.
+->
+(a) Configure Linux Server system
+
+# Switch to root
+su -
+
+# Assign IP address temporarily
+ifconfig eth0 192.168.0.45 netmask 255.255.255.0 up
+
+# OR (newer RHEL uses nmcli)
+nmcli con mod "System eth0" ipv4.addresses 192.168.0.45/24
+nmcli con mod "System eth0" ipv4.method manual
+nmcli con up "System eth0"
+
+# Change hostname
+hostnamectl set-hostname ServerXX
+
+# Verify changes
+hostnamectl
+ip addr show eth0
+
+(b) Configure Linux Client system
+su -
+
+ifconfig eth0 192.168.0.24 netmask 255.255.255.0 up
+hostnamectl set-hostname ClientXX
+hostnamectl
+ip addr show eth0
+
+(c) Restart Basic Network Services
+systemctl restart network
+systemctl restart NetworkManager
+systemctl status network
+systemctl status NetworkManager
+
+(d) Add Normal User and Login from Server Terminal
+# Add user
+useradd student
+
+# Set password
+passwd student
+
+# Switch to new user
+su - student
+
+# Show current user
+whoami
+
+# Exit to GNOME terminal (back to root)
+Exit
+
+(e) Create a Folder with Your Name and Give Full Access Rights
+mkdir /home/iqra
+chmod 777 /home/iqra
+ls -ld /home/iqra
+
+(f) Create a Folder with Another Name and Give Read-Write Access (No Execute)
+mkdir /home/project
+chmod 666 /home/project
+ls -ld /home/project
+
+
+2. 
+a) Illustrate the steps to the examiner to move a job from foreground to background 
+b) Use top command and then change the niceness of the top process priority 
+c) Schedule a cron job and send an email message every 5 minutes from normal user account to root user account.
+->
+(a) Move a Job from Foreground to Background
+# 1. Run a long process in foreground (e.g., sleep command)
+sleep 1000
+
+# 2. Press Ctrl + Z to suspend the process
+# (This pauses the running job)
+
+# 3. Check suspended jobs
+jobs
+
+# 4. Move it to background
+bg %1
+
+# 5. Verify background jobs
+Jobs
+
+(b) Use top Command and Change Niceness of top Process
+# 1. Start top command
+top
+While inside top:
+Press r (for renice).
+Enter the PID of the top process (usually shown in first line).
+Then enter a new nice value, e.g., 10 (lower priority).
+
+(c) Schedule a Cron Job to Send an Email Every 5 Minutes
+# 1. Switch to normal user
+su - student
+
+# 2. Edit cron table
+crontab -e
+
+Add this line to the crontab file:
+*/5 * * * * echo "Hello from student user" | mail -s "Cron Test Message" root
+Commands to Verify
+# List current cron jobs
+crontab -l
+
+Check if Mail Sent (as root user)
+su -
+mail
+
+Press 1 to read the mail:
+
+
+3. Create symbolic link and hard link of a file and restore the original file. Show the difference in removing the symbolic link file and hard link file to the examiner.
+->
+Step 1: Create an Original File
+# Create a simple text file
+echo "This is my original file" > original.txt
+
+# Display contents
+cat original.txt
+
+Step 2: Create a Symbolic Link
+# Create a symbolic (soft) link
+ln -s original.txt sym_link.txt
+
+# Verify links
+ls -l
+
+Step 3: Create a Hard Link
+# Create a hard link
+ln original.txt hard_link.txt
+
+# Verify links
+ls -l
+
+Step 4: Test Both Links
+# Edit the hard link file
+echo "File edited through hard link" >> hard_link.txt
+
+# Check contents of all three
+cat original.txt
+cat hard_link.txt
+cat sym_link.txt
+
+Step 5: Delete Original File and Observe Behavior
+# Remove the original file
+rm original.txt
+
+# List files again
+ls -l
+
+Step 6: Try to Access Both
+cat hard_link.txt
+cat sym_link.txt
+
+Step 7: Restore the Original File
+# Restore by copying from hard link
+cp hard_link.txt original.txt
+
+# Verify restoration
+ls -l
+cat original.txt
+
+
+4. 
+a) Create a user and change the password expiration policies using commands.
+->
+Step 1: Create a New User
+# Switch to root
+su -
+
+# Create a new user
+useradd student1
+
+# Set password for the new user
+passwd student1
+
+
+Step 2: Check Default Password Expiration Policies
+chage -l student1
+
+Step 3: Change Password Expiration Policies
+Example:
+Password valid for 30 days
+Minimum 5 days before user can change it again
+Warn user 7 days before expiry
+chage -M 30 -m 5 -W 7 student1
+✅ Explanation:
+-M 30 → Maximum validity = 30 days
+-m 5 → Minimum days before next password change = 5
+-W 7 → Warning days before expiry = 7
+
+
+Step 4: Verify New Settings
+chage -l student1
+
+
+5. 
+a) Find all files on your server that have a size greater than 500 MB
+->
+Command to Find Files Greater Than 500 MB
+find / -type f -size +500M
+
+
+
+
+
+
+
+
+
+6. 
+a) Create a backup of the /tmp directory in an archive with the name /tmp.tar. 
+b) Extract the same file in /tmp2 directory.
+->
+(a) Create a Backup of /tmp Directory as /tmp.tar
+Command
+tar -cvf /tmp.tar /tmp
+
+
+You can confirm it with:
+ls -lh /tmp.tar
+
+(b) Extract the Same File into /tmp2 Directory
+Step 1: Create a Target Directory
+mkdir /tmp2
+Step 2: Extract the Archive
+tar -xvf /tmp.tar -C /tmp2
+
+
+
+Verification
+ls /tmp2/tmp
+7. 
+a) Create a user ‘xyz’, a group ‘g1’ using command. Add user ‘xyz’ to group ‘g1’. 
+b) Create two directories /data/sales and /data/support. Change the group ownership of these directories to group ‘g1
+->
+(a) Create a User ‘xyz’ and Group ‘g1’, then Add User to the Group
+Step 1: Create Group
+groupadd g1
+
+Verify group creation:
+getent group g1
+
+Step 2: Create User
+useradd xyz
+
+Verify user creation:
+id xyz
+
+Step 3: Add User ‘xyz’ to Group ‘g1’
+usermod -aG g1 xyz
+
+Verify that user xyz is now part of group g1:
+id xyz
+
+
+(b) Create Directories /data/sales and /data/support and Change Group Ownership
+Step 1: Create Directories
+mkdir -p /data/sales
+mkdir -p /data/support
+
+Verify:
+ls -ld /data/sales /data/support
+
+Step 2: Change Group Ownership to ‘g1’
+chown :g1 /data/sales
+chown :g1 /data/support
+
+Verify new ownership:
+ls -ld /data/sales /data/support
+8. 
+a) Write a command to list all the processes currently running on your system and redirect the output to a text file 
+b) Use vi editor to perform the following : 
+i. Append a text after the current position of the cursor . 
+ii. Open a new line under the current position of the cursor. 
+iii. Delete a single character 
+iv. Delete a complete line . 
+v. Delete from the current position up to the end of the line .
+->
+(a) List All Running Processes and Redirect Output to a Text File
+Command
+ps -ef > processes.txt
+
+
+
+You can verify the file was created:
+cat processes.txt
+
+(b) Using vi Editor – Basic Operations
+Let’s say you open a file named notes.txt:
+vi notes.txt
+Now perform the following operations inside vi:
+
+i. Append Text After Current Cursor Position
+Press:
+a
+Then type your text, e.g.:
+Hello, this is appended text.
+Explanation:
+a → Enter insert mode after the cursor.
+To save and exit:
+Press Esc → :wq → Enter
+
+ii. Open a New Line Under the Current Cursor Position
+Press:
+o
+Then type your new line text.
+Explanation:
+o → Opens a new blank line below the current line and enters insert mode.
+
+
+iii. Delete a Single Character
+Press (in command mode):
+x
+Explanation:
+x → Deletes the single character under the cursor.
+
+
+iv. Delete a Complete Line
+Press:
+dd
+Explanation:
+dd → Deletes the entire line where the cursor is currently placed.
+
+
+v. Delete from Current Position up to End of Line
+Press:
+D
+(uppercase D)
+Explanation:
+D → Deletes from the cursor position to the end of the line.
+
+
+
+
+
+
+9.
+a) Apply advanced permission to group Tyit such that the members of Tyit group are able to share files in a shared group directory. 
+b) Use chattr command to show effect of any two attributes.
+->
+(a) Apply Advanced Permissions to Group Tyit for File Sharing in a Shared Directory
+We’ll create a shared group directory where all members of group Tyit can read, write, and share files.
+
+Step 1: Create Group Tyit
+groupadd Tyit
+
+Step 2: Create Shared Directory
+mkdir /shared
+
+Step 3: Change Group Ownership to Tyit
+chown :Tyit /shared
+
+Verify:
+ls -ld /shared
+
+Step 4: Give Full Permissions to Group
+chmod 2775 /shared
+
+Explanation of 2775:
+2 → Setgid bit, ensures that any new file/folder created in /shared will inherit group ownership Tyit.
+7 → Owner (rwx)
+7 → Group (rwx)
+5 → Others (r-x)
+
+Verify permissions:
+ls -ld /shared
+
+Step 5: Test File Sharing
+Add a user to Tyit group:
+usermod -aG Tyit user1
+
+
+Then login as user1 and create a file:
+su - user1
+cd /shared
+touch testfile
+ls -l testfile
+
+
+(b) Use chattr Command to Show the Effect of Any Two Attributes
+The chattr (change attribute) command changes file attributes at the filesystem level.
+Let’s demonstrate two attributes:
+1.+i → Immutable (cannot modify or delete the file)
+2.+a → Append-only (can only add data, not overwrite)
+
+
+Step 1: Create a Test File
+touch demo.txt
+
+Step 2: Apply Immutable Attribute
+chattr +i demo.txt
+Verify:
+lsattr demo.txt
+
+Now try to delete it:
+rm demo.txt
+
+Immutable file cannot be deleted or modified — even by root (until attribute removed).
+
+Step 3: Apply Append-only Attribute
+chattr +a demo.txt
+
+Verify:
+lsattr demo.txt
+
+Try to overwrite:
+echo "New content" > demo.txt
+
+Try to append:
+echo "Appending content" >> demo.txt
+Append-only allows adding content but not overwriting.
+To remove it:
+chattr -a demo.txt
+
