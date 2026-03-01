@@ -12,10 +12,11 @@ b) Import the cube in Microsoft excel and create the pivot table and pivot chart
 -Select the image-format-picture effects-3D rotation
 
 Prac2:- Apply the what-if analysis for data visualization. Design and generate necessary reports based on the data warehouse data. Use Excel
--Make the table from the question
--Find sum :
+-Make the table from the question(no of books=60,40/Unit profit=50,20)
+-Find sum : write the formula in the above blank space
 =SUM(n1*n2+n3*n4)
 -Data—WhatIF analysis—Scenario Manager—Add-(Scenario name-Select cell-Scenario Value)
+Goal Seek
 
 Pract3:- Perform the data classification using classification algorithm using R/Python
 Code:-
