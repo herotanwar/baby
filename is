@@ -1,0 +1,255 @@
+IS Practical
+Pract1: Configure Routers for syslog and NTP operations
+a.	OSPF MD5 authentication
+b.	NTP
+c.	To log messages to the syslog server
+
+Step 1: Make the topology as per the table and change the name according to the table
+Step 2: Off the switch and add the HWIC-2 in both the space in all 3 routers (1941router)
+Step 3: Connect the wires according to the addressing table (routers red without clock wire)
+Step 4: Give the IP addresses to all the servers and routers
+
+Part1: Configure OSPF MD5 Authentication
+R1:
+Router(config)#router ospf 1
+Router(config-router)#network 192.168.1.0 0.0.0.255 area 0
+Router(config-router)#network 10.1.1.0 0.0.0.255 area 0
+
+- Configure OSPF MD5 authentication for all the routers in area 0
+Router(config-router)#router ospf 1
+Router(config-router)#area 0 authentication message-digest
+
+- Configure the MD5 key for all the routers in area 0.
+Router(config-router)#int s0/0/0
+Router(config-if)#ip ospf message-digest-key 1 md5 MD5pa55	
+Router#show ip ospf interface
+
+R2:
+Router(config)#router ospf 1
+Router(config-router)#network 10.1.1.0 0.0.0.255 area 0
+Router(config-router)#network 10.2.2.0 0.0.0.255 area 0
+
+Router(config-router)#router ospf 1
+Router(config-router)#area 0 authentication message-digest
+Router(config-router)#int s0/0/0
+Router(config-if)#ip ospf message-digest-key 1 md5 MD5pa55
+Router(config-if)#int s0/0/1
+Router(config-if)#ip ospf message-digest-key 1 md5 MD5pa55
+Router#show ip ospf interface
+
+R3: 
+Router(config)#router ospf 1
+Router(config-router)#network 192.168.3.0 0.0.0.255 area 0
+Router(config-router)#network 10.2.2.0 0.0.0.255 area 0
+
+Router(config-router)#router ospf 1
+Router(config-router)#area 0 authentication message-digest
+Router(config-router)#int s0/0/1
+Router(config-if)#ip ospf message-digest-key 1 md5 MD5pa55
+Router#show ip ospf interface
+
+Part 2: Configure NTP
+-Enable NTP authentication on PC-A.
+Go to NTP server-services-NTP-enable-Key:1-Pass:NTPpa55
+
+- Configure R1, R2, and R3 as NTP clients.
+R1:
+Router(config)#ntp server 192.168.1.5
+
+- Configure routers to update hardware clock.
+Router(config)#ntp update-calendar
+Router#show clock
+
+- Configure NTP authentication on the routers.
+Router(config)#ntp authenticate
+Router(config)#ntp trusted-key 1
+Router(config)#ntp authentication-key 1 md5 NTPpa55
+
+- Configure routers to timestamp log messages.
+Router(config)#service timestamps log datetime msec
+
+Part3: Configure Routers to Log Messages to the Syslog Server
+- Configure the routers to identify the remote host (Syslog Server) that will receive logging messages.
+Router(config)#logging host 192.168.1.6
+Router#show logging
+
+R2:
+Router(config)#ntp server 192.168.1.5
+Router(config)#ntp update-calendar
+Router(config)#ntp authenticate
+Router(config)#ntp trusted-key 1
+Router(config)#ntp authentication-key 1 md5 NTPpa55
+Router(config)#service timestamps log datetime msec
+Router(config)#logging host 192.168.1.6
+
+R3:
+Router(config)#ntp server 192.168.1.5
+Router(config)#ntp update-calendar
+Router(config)#ntp authenticate
+Router(config)#ntp trusted-key 1
+Router(config)#ntp authentication-key 1 md5 NTPpa55
+Router(config)#service timestamps log datetime msec
+Router(config)#logging host 192.168.1.6
+
+Prac2: Configure AAA authentication
+a.	Configure a local user account on router and configure authenticate on the console and vty lines using local AAA
+b.	Verity local AAA authentication from the router console and the PC-A client
+Step 1: Make the topology as per the table and change the name according to the table
+Step 2: Off the switch and add the HWIC-2 in both the space in all 3 routers
+Step 3: Connect the wires according to the addressing table (routers red without clock wire)
+Step 4: Give the IP addresses to all the servers and routers
+Code:-
+Router OSPF:
+R1:-
+R1(config)#router ospf 1
+R1(config-router)#network 192.168.1.0 0.0.0.255 area 0
+R1(config-router)#network 10.1.1.0 0.255.255.255 area 0
+R2:-
+R2(config)#router ospf 1
+R2(config-router)#network 192.168.2.0 0.0.0.255 area 0
+R2(config-router)#network 10.1.1.0 0.255.255.255 area 0
+R2(config-router)#network 10.2.2.0 0.255.255.255 area 0
+R3:-
+R3(config)#router ospf 1
+R3(config-router)#network 192.168.3.0 0.0.0.255 area 0
+R3(config-router)#network 10.2.2.0 0.255.255.255 area 0
+
+
+Part 1: Configure Local AAA Authentication for Console Access on R1
+R1:-
+-Configure a local username on R1
+R1(config)#username Admin1 secret admin1pa55
+
+- Configure local AAA authentication for console access on R1.
+R1(config)#aaa new-model
+R1(config)#aaa authentication login default local
+
+- Configure the line console to use the defined AAA authentication method.
+R1(config)# line console 0
+R1(config-line)# login authentication default
+
+- Verify the AAA authentication method.
+R1(config-line)# end
+R1# exit
+Username: Admin1 
+Password: admin1pa55
+
+Part 2:- Configure Local AAA Authentication for vty Lines on R1
+- Configure domain name and crypto key for use with SSH.
+R1(config)#ip domain-name ccnasecurity.com
+R1(config)#crypto key generate rsa 
+(Write number 1024)
+
+- Configure a named list AAA authentication method for the vty lines on R1.
+R1(config)#aaa authentication login SSH-LOGIN local
+
+-Configure the vty lines to use the defined AAA authentication method.
+R1(config)#line vty 0 4
+R1(config-line)#login authentication SSH-LOGIN
+R1(config-line)#transport input ssh
+R1(config-line)#end
+
+- Verify the AAA authentication method. PC-A
+ssh -l Admin1 192.168.1.1
+Password: admin1pa55
+Part3:- Configure Server-Based AAA authentication using TACAS+ on R2
+- Configure a backup local database entry called Admin.
+username Admin2 secret admin2pa55
+
+- Configure the TACACS+ server specifics on R2
+R2(config)# tacacs-server host 192.168.2.2
+R2(config)# tacacs-server key tacacspa55
+
+- Configure AAA login authentication for console access on R2.
+R2(config)# aaa new-model
+R2(config)# aaa authentication login default group tacacs+ local
+
+- Configure the line console to use the defined AAA authentication method.
+R2(config)# line console 0
+R2(config-line)# login authentication default
+
+- Verify the AAA authentication method.
+R2(config-line)# end
+R2# exit
+Username: Admin2 
+Password: admin2pa55 
+R2>
+
+Part4: Configure Server-Based AAA Authentication Using RADIUS on R3
+- Configure a backup local database entry called Admin.
+R3(config)# username Admin3 secret admin3pa55
+
+- Configure the RADIUS server specifics on R3.
+R3(config)# radius-server host 192.168.3.2
+R3(config)# radius-server key radiuspa55
+
+- Configure AAA login authentication for console access on R3.
+R3(config)# aaa new-model
+R3(config)# aaa authentication login default group radius local
+
+- Configure the line console to use the defined AAA authentication method.
+R3(config)# line console 0
+R3(config-line)# login authentication default
+
+- Verify the AAA authentication method.
+R3(config-line)# end
+R3# exit
+Username: Admin3 
+Password: admin3pa55 
+R3>
+
+Prac3: Configure Extended ACLs
+a.	Configure, apply and verify and extended numbered ACL
+Step 1: Make the topology as per the table and change the name according to the table (Note: Take the router of 2911)
+Step 2: Connect the wires according to the addressing table 
+Step 3: Give the IP addresses to all the servers and routers
+Code:-
+Part 1: Configure, Apply and Verify an Extended Numbered ACL
+- Configure an ACL to permit FTP and ICMP. (R1)
+Router(config)#access-list ?
+Router(config)#access-list 100 ?
+Router(config)#access-list 100 permit ?
+Router(config)#access-list 100 permit tcp ?
+Router(config)#access-list 100 permit tcp 172.22.34.64 ?
+Router(config)#access-list 100 permit tcp 172.22.34.64 0.0.0.31 ?
+Router(config)#access-list 100 permit tcp 172.22.34.64 0.0.0.31 host 172.22.34.62 ?
+Router(config)#access-list 100 permit tcp 172.22.34.64 0.0.0.31 host 172.22.34.62 eq ?
+Router(config)#access-list 100 permit tcp 172.22.34.64 0.0.0.31 host 172.22.34.62 eq ftp
+Router(config)#access-list 100 permit icmp 172.22.34.64 0.0.0.31 host 172.22.34.62
+
+- Apply the ACL on the correct interface to filter traffic
+Router(config)#interface gigabitEthernet 0/0
+Router(config-if)#ip access-group 100 in
+
+- Verify the ACL implementation.
+PC1-Command prompt-
+Ping 172.22.34.62
+(1 req time out)
+ftp 172.22.34.62
+username:cisco
+password:cisco
+ftp>quit
+
+Part 2: Configure, Apply and Verify an Extended Named ACL
+- Configure an ACL to permit HTTP access and ICMP
+Router(config)#ip access-list
+Router(config)#ip access-list extended HTTP_ONLY
+Router(config-ext-nacl)#permit tcp 172.22.34.96 ?
+Router(config-ext-nacl)#permit tcp 172.22.34.96 0.0.0.15 ?
+Router(config-ext-nacl)#permit tcp 172.22.34.96 0.0.0.15 host 172.22.34.62 eq www
+Router(config-ext-nacl)#permit icmp 172.22.34.96 0.0.0.15 host 172.22.34.62
+
+- Apply the ACL on the correct interface to filter traffic.
+Router(config)#interface gigabitEthernet 0/1
+Router(config-if)#ip access-group HTTP_ONLY in
+
+- Verify the ACL implementation.
+PC2 Cmd prompt:
+C:\>ping 172.22.34.62
+(The ping should be successful)
+C:\>ftp 172.22.34.62
+(The connection should fail)
+PC2 web browser:
+172.22.34.62
+
+
