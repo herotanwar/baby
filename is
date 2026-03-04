@@ -3,12 +3,10 @@ Pract1: Configure Routers for syslog and NTP operations
 a.	OSPF MD5 authentication
 b.	NTP
 c.	To log messages to the syslog server
-
 Step 1: Make the topology as per the table and change the name according to the table
 Step 2: Off the switch and add the HWIC-2 in both the space in all 3 routers (1941router)
 Step 3: Connect the wires according to the addressing table (routers red without clock wire)
 Step 4: Give the IP addresses to all the servers and routers
-
 Part1: Configure OSPF MD5 Authentication
 R1:
 Router(config)#router ospf 1
@@ -81,6 +79,7 @@ Router(config)#ntp trusted-key 1
 Router(config)#ntp authentication-key 1 md5 NTPpa55
 Router(config)#service timestamps log datetime msec
 Router(config)#logging host 192.168.1.6
+Router#show logging
 
 R3:
 Router(config)#ntp server 192.168.1.5
@@ -90,6 +89,10 @@ Router(config)#ntp trusted-key 1
 Router(config)#ntp authentication-key 1 md5 NTPpa55
 Router(config)#service timestamps log datetime msec
 Router(config)#logging host 192.168.1.6
+Router#show logging
+
+-Examine logs of the syslog server
+go to the syslog server--services--syslog--see the log messages
 
 Prac2: Configure AAA authentication
 a.	Configure a local user account on router and configure authenticate on the console and vty lines using local AAA
@@ -98,7 +101,7 @@ Step 1: Make the topology as per the table and change the name according to the 
 Step 2: Off the switch and add the HWIC-2 in both the space in all 3 routers
 Step 3: Connect the wires according to the addressing table (routers red without clock wire)
 Step 4: Give the IP addresses to all the servers and routers
-Code:-
+
 Router OSPF:
 R1:-
 R1(config)#router ospf 1
@@ -152,6 +155,7 @@ R1(config-line)#end
 - Verify the AAA authentication method. PC-A
 ssh -l Admin1 192.168.1.1
 Password: admin1pa55
+
 Part3:- Configure Server-Based AAA authentication using TACAS+ on R2
 - Configure a backup local database entry called Admin.
 username Admin2 secret admin2pa55
