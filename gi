@@ -360,14 +360,213 @@ Geo-reference the aerial image of University of Mumbai Fort Campus. (Hint: use I
 elevations map of India. To study the elevation of hilly area of North India, extract the required Raster area by Extent. Perform Hill Shade surface analysis using the above elevation map. 
 
 17.Add Mumbai map and highlight the all Chowpatty in Mumbai. 
+Add Mumbai Base Map
+Open QGIS.
+Install QuickMapServices Plugin (if not installed):
+Go to Plugins → Manage and Install Plugins
+Search QuickMapServices
+Click Install.
+Add map:
+Web → QuickMapServices → OSM → OpenStreetMap
+Zoom to Mumbai
+Create Chowpatty Vector Layer
+Click Layer → Create Layer → New Shapefile Layer.
+Set:
+File Name: Chowpatty.shp
+Geometry Type: Point
+Add fields:
+
+Add Chowpatty Locations
+Select Chowpatty layer.
+Click Toggle Editing (✏️).
+| id | name              |
+| -- | ----------------- |
+| 1  | Girgaon Chowpatty |
+| 2  | Juhu Chowpatty    |
+| 3  | Dadar Chowpatty   |
+| 4  | Aksa Chowpatty    |
+
+Highlight Chowpatty Points
+Right-click Chowpatty layer.
+Click Properties → Symbology.
+Choose Simple Marker.
+Set:
+Color: Red
+Size: 5–6 mm
+Shape: Star or Circle
+Click Apply → OK.
+
+Show Labels
+Right-click Chowpatty layer.
+Click Properties → Labels.
+Select Single Labels.
+Choose field name.
+
+Create Final Map Layout
+Go to Project → New Print Layout.
+Add:Map-Legend-North Arrow-Scale Bar
+Add title:“Chowpatty Beaches in Mumbai”
 
 18.Create a 3-vector layer to store points representing locations: college, restaurant, hospitals. 
 1. Add roads and railway tracks. 
 2. Change the color and size of point markers on vector layer to visually differentiate between categories of restaurants. 
-
+18.Create a 3-vector layer to store points representing locations: college, restaurant, hospitals. 
+1. Add roads and railway tracks. 
+2. Change the color and size of point markers on vector layer to visually differentiate between categories of restaurants. 
 19. create a map from above layers: add label, legend, scale, Add a suitable title with proper formatting. 
+Create Point Layer for Colleges
+Open QGIS → New Project.
+Click Layer → Create Layer → New Shapefile Layer.
+Set:
+File name: Colleges.shp
+Geometry type: Point
+Add fields:
+| Field | Type         |
+| ----- | ------------ |
+| id    | Whole Number |
+| name  | Text         |
+Add College Locations
+Select Colleges layer.
+Click Toggle Editing (✏️).
+Click Add Point Feature.
+Add 2–3 college points on the map.
+Example data:
+| id | name                |
+| -- | ------------------- |
+| 1  | City College        |
+| 2  | Science College     |
+| 3  | Engineering College |
+Create Point Layer for Restaurants
+Go to Layer → Create Layer → New Shapefile Layer.
+Set:
+File name: Restaurants.shp
+Geometry: Point
+Add fields:
+| Field    | Type         |
+| -------- | ------------ |
+| id       | Whole number |
+| name     | Text         |
+| category | Text         |
+Add Restaurant Points
+Add 4–5 restaurants.
+Create Point Layer for Hospitals
+Click Layer → Create Layer → New Shapefile Layer.
+Set:
+File name: Hospitals.shp
+Geometry: Point
+Add fields:
+Add 2–3 hospital points.
+Create Roads Layer
+Layer → Create Layer → New Shapefile Layer
+Set:
+File name: Roads.shp
+Geometry: Line
+Create Railway Track Layer
+Layer → Create Layer → New Shapefile Layer
+Set:
+File name: Railway.shp
+Geometry: Line
+Change Color and Size of Restaurant Markers
+This step is important for the practical.
+Right click Restaurants layer.
+Click Properties → Symbology.
+Change:
+Single Symbol → Categorized
+In Value, select category.
+Click Classify.
+Click each symbol to change marker size
+| Category  | Color  | Size |
+| --------- | ------ | ---- |
+| Veg       | Green  | 4    |
+| Non-Veg   | Red    | 5    |
+| Fast Food | Yellow | 6    |
+Final Map Layout (Optional but recommended)
+Go to:
+Project → New Print Layout
+Add:Map-Legend-Scale Bar-North Arrow-Title
 
-20.Create vector layer for your residential layer. Add required data to demonstrate the join attribute by location. To show the count points in polygon by using analysis tools. (Prac7b&c)	 
+20.Create vector layer for your residential layer. Add required data to demonstrate the join attribute by location. To show the count points in polygon by using analysis tools. 
+Create Residential Vector Layer (Polygon)
+Open QGIS.
+Click Layer → Create Layer → New Shapefile Layer.
+Set the following:
+File name: Residential.shp
+Geometry Type: Polygon
+Add fields:
+| Field Name | Type         |
+| ---------- | ------------ |
+| res_id     | Whole number |
+| res_name   | Text         |
+Click OK and save.
+Now the Residential layer will appear in the Layers panel.
+2. Digitize Residential Areas
+Select Residential layer.
+Click Toggle Editing (✏️).
+Click Add Polygon Feature.
+Draw 4 residential areas on the map.
+Example attribute table:
+| res_id | res_name |
+| ------ | -------- |
+| 1      | Area_A   |
+| 2      | Area_B   |
+| 3      | Area_C   |
+| 4      | Area_D   |
+3. Create Point Layer (Example: Houses or Wells)
+Go to Layer → Create Layer → New Shapefile Layer.
+Choose:
+File name: Houses.shp
+Geometry Type: Point
+Add fields:
+| Field    | Type         |
+| -------- | ------------ |
+| house_id | Whole number |
+4. Digitize Points
+Select Houses layer.
+Click Toggle Editing.
+Click Add Point Feature.
+Add points inside residential polygons.
+Example:
+| house_id |
+| -------- |
+| 1        |
+| 2        |
+| 3        |
+| 4        |
+| 5        |
+5. Perform Join Attribute by Location
+Go to:
+Vector → Data Management Tools → Join Attributes by Location
+Set parameters:
+| Option              | Value                                 |
+| ------------------- | ------------------------------------- |
+| Target layer        | Residential                           |
+| Join layer          | Houses                                |
+| Geometric predicate | contains / intersects                 |
+| Join type           | Take summary of intersecting features |
+Select Count option->Click Run.
+| res_id | res_name | count |
+| ------ | -------- | ----- |
+| 1      | Area_A   | 2     |
+| 2      | Area_B   | 1     |
+| 3      | Area_C   | 1     |
+| 4      | Area_D   | 1     |
+
+6. Count Points in Polygon (Analysis Tool)
+Go to:
+Vector → Analysis Tools → Count Points in Polygon
+Fill settings:
+| Option        | Value       |
+| ------------- | ----------- |
+| Polygon layer | Residential |
+| Points layer  | Houses      |
+run
+| res_id | res_name | NUMPOINTS |
+| ------ | -------- | --------- |
+| 1      | Area_A   | 2         |
+| 2      | Area_B   | 1         |
+| 3      | Area_C   | 1         |
+| 4      | Area_D   | 1         |
+
 21.Create a map based on following assumptions 
 1. Add 1 Highways (id= "375") 
 2. Add 6 Farms (id, own_name) (2 farms near Highway) 
@@ -381,6 +580,148 @@ elevations map of India. To study the elevation of hilly area of North India, ex
 10. Add 4 wells (3 in farms and 1 in residential area) 
 
 23.Create a map of Railway route CST to Chembur including the building adjacent rails. Use any 7 layers and show stations. Create dataset for all layers. (prac3)
+Set Map Location (Mumbai Area)
+
+Install QuickMapServices Plugin if not installed.
+
+Go to Web → QuickMapServices → OSM → OpenStreetMap.
+
+In the search bar, type CST Mumbai
+
+Identify Route Stations
+
+The railway line from CST to Chembur includes stations like:
+
+Chhatrapati Shivaji Maharaj Terminus
+
+Masjid railway station
+
+Sandhurst Road railway station
+
+Dockyard Road railway station
+
+Reay Road railway station
+
+Cotton Green railway station
+
+Sewri railway station
+
+Wadala Road railway station
+
+Chembur railway station
+
+Layer Name	Geometry Type	Purpose
+Railway_Route	Line	CST → Chembur railway line
+Stations	Point	Railway stations
+Buildings	Polygon	Buildings near railway
+Roads	Line	Roads near tracks
+WaterBodies	Polygon	Lakes / sea area
+Landuse	Polygon	Residential / industrial
+Boundary	Polygon	Mumbai boundary
+
+Save them in a dataset folder
+
+Digitize Railway Route
+
+Select Railway_Route layer.
+
+Click Toggle Editing Mode ✏️
+
+Select Add Line Feature.
+
+Draw the railway track from:
+
+CST → Masjid → Sandhurst → Dockyard → Reay Road → Sewri → Wadala → Chembur.
+
+Click Save Edits.
+
+Add Stations
+
+Select Stations layer.
+
+Click Add Point Feature.
+
+Add points at each station location.
+
+Add attribute field Station_Name.
+
+| ID | Station_Name   |
+| -- | -------------- |
+| 1  | CST            |
+| 2  | Masjid         |
+| 3  | Sandhurst Road |
+| 4  | Dockyard Road  |
+| 5  | Reay Road      |
+| 6  | Sewri          |
+| 7  | Wadala Road    |
+| 8  | Chembur        |
+
+Add Buildings Adjacent to Railway
+
+Select Buildings layer.
+
+Click Add Polygon Feature.
+
+Draw buildings along the railway corridor.
+
+Add attribute:
+| Building_ID | Type        |
+| ----------- | ----------- |
+| 1           | Residential |
+| 2           | Commercial  |
+| 3           | Industrial  |
+
+Style the Layers
+
+Right click layer → Properties → Symbology
+
+Suggested styles:
+
+Railway Route → Red thick line 🚆
+
+Stations → Blue circle
+
+Buildings → Grey polygons
+
+Roads → Black line
+
+WaterBodies → Light blue
+
+Landuse → Green
+
+Boundary → Thin black outline
+
+Show Station Labels
+
+Right click Stations layer.
+
+Click Properties → Labels.
+
+Select Single Labels.
+
+Choose field Station_Name.
+
+Now station names will appear on the map.
+Create Final Map Layout
+
+Go to Project → New Print Layout.
+
+Click Add Map.
+
+Add:
+
+Title: Railway Route from CST to Chembur
+
+Legend
+
+Scale Bar
+
+North Arrow
+Export Map
+
+Click:
+
+Layout → Export as Image / PDF
 
 24.Open Ind_adm0.shp file in QGIS Geo-reference the Indian Political Map at appropriate location. (Hint: use Image from required Files) (Prac6a)
 
